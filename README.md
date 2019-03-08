@@ -9,7 +9,7 @@
 ## Run Programme
 In order to run this project either clone or download the project
 * Open the commnad line where the project is located
-* RUn the following command
+* Run the following command
     
     python3 ./menu.py
     

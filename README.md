@@ -11,6 +11,7 @@
 In order to run this project either clone or download the project
 * Open the commnad line where the project is located
 * Run the following command
+    *Before running the programme you will need to create your own key and security group and edit both the key and security group within the run_newwebserver.py script
 
 ~~~
 python3 ./menu.py

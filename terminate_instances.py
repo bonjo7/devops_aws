@@ -23,7 +23,7 @@ for instance_id in ec2.instances.all():
     try:
         instance = ec2.Instance(user_input_instance)
         response = instance.terminate()
-        print ('Istance with ID: ', user_input_instance, ' has been terminated', '\n Review of termination \n' ,response)
+        print ('Istance with ID: ', user_input_instance, ' has been terminated', '\n Review of termination \n\n\n' ,response)
 
     except Exception as error:
         print('Error terminating instance, please try again', '\n', str(error))      

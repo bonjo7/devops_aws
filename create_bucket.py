@@ -3,6 +3,7 @@ import time
 import sys
 import boto3
 import subprocess
+import webbrowser
 
 s3 = boto3.resource("s3")
 
@@ -34,7 +35,7 @@ def create_bucket():
     global bucket_name
     bucket_name = input('Enter bucket name: ')
 
-    response = s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'}, ACL='public-read')
+    s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'}, ACL='public-read')
     
     print ('Bucket successfully created, bucket name = ', bucket_name)
 
@@ -49,9 +50,9 @@ def upload_image():
   global image_name
   image_name = input('Enter the image name, please include the file extension eg. .jpg .png .txt etc....: ')
   try:
-    response = s3.Object(bucket_name, image_name).put(Body=open(image_name, 'rb'), ACL='public-read')
+    s3.Object(bucket_name, image_name).put(Body=open(image_name, 'rb'), ACL='public-read')
     
-    print('Image successfully uploaded: ', response)
+    print('Image successfully uploaded\nPusing image to instance')
 
     #Creating variables to stings which will be used to push image to the index page
     
@@ -60,7 +61,7 @@ def upload_image():
     permissions = " 'sudo chmod 777 /var/www/html/index.html'"
     #Command to ssh into instance, ip pulled from text file and change permissions of index
     ssh_string = ssh + instanceIP + permissions
-    print(ssh_string)
+    #print(ssh_string)
     subprocess.call(ssh_string, shell=True)
     
     #Allowing some time to ensure commands are exectuded
@@ -69,8 +70,10 @@ def upload_image():
     #command to be used to append the index file with the image from the newlt formed bucket
     command_string = ssh + instanceIP + ' \'sudo echo "<img src=https://s3-eu-west-1.amazonaws.com/' + bucket_name + '/' + image_name + '>" >> /var/www/html/index.html\''
     #Command to push image in bucket to index.html of the running instance
-    print(command_string) 
+    #print(command_string) 
     subprocess.call(command_string, shell=True)
+
+    
 
   except Exception as error:
     print('Error uploading image', '\n', str(error))
@@ -99,6 +102,8 @@ def run_bucket_functions():
 
   print('\n Upload an image to your newly created bucket')
   upload_image()
+
+  webbrowser.open("http://" + instanceIP) # Open broswer with image displayed
 
 #RUn the run_bucket_functions function
 run_bucket_functions()  

@@ -9,6 +9,9 @@ import boto3
 #Import subprocess
 import subprocess
 
+#IMport time class
+import time
+
 #Creating colour class in order to change text colour
 class bcolors:
     
@@ -17,6 +20,8 @@ class bcolors:
     WARNING = '\033[93m' #Yellow
     FAIL = '\033[91m' #Red
     ENDC = '\033[0m' #white to revert back to white colour
+
+###################### Create instance #########################################        
 
 #Using try exception to ensure the user is notifed if the instance created or not
 try:
@@ -80,8 +85,10 @@ try:
         ]
     ) 
 except Exception as error:
-    print(bcolors.FAIL + "Instance did not create: ID of the instance is:  ", instance[0].id, ". " + str(error) + bcolors.ENDC)
+    print(bcolors.FAIL + "Instance did not create: ID of the instance is:  " + instance[0].id + ". " + str(error) + bcolors.ENDC)
 
+
+############################### Wait for instance to initialise ###########################################
 
 print(bcolors.WARNING + "Your instance is now initializing, please wait...." + bcolors.ENDC)
 
@@ -92,22 +99,41 @@ instance[0].reload()
 global instanceIP
 instanceIP = instance[0].public_ip_address
 #If all goes well the following should be printed at the command line
-print (bcolors.OKGREEN + "The following instanace with ID: ", instance[0].id, ", has been created and is running.\nName of the instance: ", tagValue, "\nThe public ip address is: ", instanceIP + "\n\n" + bcolors.ENDC)
+print (bcolors.OKGREEN + "The following instanace with ID: " + instance[0].id + ", has been created and is running.\nName of the instance: " + tagValue + "\nThe public ip address is: " + instanceIP + "\n\n" + bcolors.ENDC)
 
 #Write the instance ip to a file which I will call in the create bucket script to SSH into to push the bucket image to the index page
 file_instanceIP = open("instanceID.txt", "w")
 file_instanceIP.write(instanceIP)
 
-print(bcolors.WARNING + 'Checking to see if instance is running... please wait' + bcolors.ENDC)
 
-permission = "chmod 700 check_webserver.py"
+############### Check Webserver is running ######################################################################
+
+print(bcolors.WARNING + 'Checking to see if instance is running... please wait\nRunning the following commands\n\n' + bcolors.ENDC)
+
+copy_check = "scp -i Assignment_key.pem check_webserver.py ec2-user@" + instanceIP + ":."
+print(copy_check)
+
+install_python_3 = "ssh -i Assignment_key.pem ec2-user@" + instanceIP + " 'sudo yum install python37 -y'"
+print(install_python_3)
+
+
+permission = "ssh -i Assignment_key.pem ec2-user@" + instanceIP + " 'chmod 700 check_webserver.py'"
 print(permission) 
 
-subprocess.call(permission, check = True, shell = True)
 
-cmd_check = "scp -i Assignment_key.pem check_webserver.py ec2-user@" + instanceIP + ":."
+run_check_server = "ssh -i Assignment_key.pem ec2-user@" + instanceIP + " 'python3 check_webserver.py'"
+print(run_check_server)
 
-print(cmd_check)
+try:
+    subprocess.call(copy_check, check=True, shell=True)
+    time.sleep(2)
+    subprocess.call(install_python_3, check = True)
+    time.sleep(2)
+    subprocess.call(permission, check = True, shell = True)
+    time.sleep(2)
+    subprocess.call(run_check_server, check = True)
 
-subprocess.call(cmd_check, check=True, shell=True)
+except Exception as error:
+    print(bcolors.FAIL + "Error coping and running check web sever file\n\n" + str(error) + bcolors.ENDC)
+
 

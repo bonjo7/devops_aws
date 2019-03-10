@@ -35,7 +35,7 @@ time.sleep(2)
 try:
     bucket.objects.all().delete()
     response = bucket.delete()
-    print ('Bucket with name: ', user_input_deleteBucket, ' has been deleted', '\n Full details of bucket deleted are : ', response)
+    print ('Bucket with name: ' + user_input_deleteBucket + ' has been deleted', '\n Full details of bucket deleted are : \n' + response)
 except Exception as error:
-    print('Error deleting bucket, try again', '\n', str(error))
+    print('Error deleting bucket, try again' + '\n' + str(error))
     

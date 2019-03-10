@@ -7,6 +7,13 @@ Try running this program from the command line like this:
 
 import subprocess
 
+#Creating colour class in order to change text colour
+class bcolors:
+    
+    OKGREEN = '\033[92m' #Green
+    FAIL = '\033[91m' #Red
+    ENDC = '\033[0m' #white to revert back to white colour
+
 file_instanceIP = open("instanceID.txt", "r")
 
 global instanceIP
@@ -18,10 +25,10 @@ def checkhttpd():
     cmd = 'ps -A | grep httpd' 
    
     subprocess.call(cmd, check=True, shell=True)
-    print("Web Server IS running")
+    print(bcolors.OKGREEN + "Web Server IS running" + bcolors.ENDC)
    
   except subprocess.CalledProcessError:
-    print("Web Server IS NOT running")
+    print(bcolors.FAIL + "Web Server IS NOT running, attempting to start" + bcolors.ENDC)
     startCmd = 'sudo systemctl start httpd'
     subprocess.call(startCmd, check=True, shell=True)
     

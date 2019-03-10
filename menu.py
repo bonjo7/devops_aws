@@ -27,6 +27,7 @@ def mainMenu():
       | 4. Create Bucket          |
       | 5. List Buckets           | 
       | 6. Delete Bucket(s)       |
+      |---------------------------|
       | 0. Exit                   |
       -----------------------------
       """)
